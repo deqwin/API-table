@@ -1,0 +1,9 @@
+# 忽略node_modules
+node_modules
+
+# Logs
+logs
+*.log
+
+# 忽略打包文件
+dist
