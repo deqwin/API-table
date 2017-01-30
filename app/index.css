@@ -1,0 +1,168 @@
+/**
+    created by deqwin
+    2017/1/27
+*/
+html{
+    height: 100%;
+}
+body{
+    margin: 0;
+    height: 100%;
+    background: #fff;
+    font-size: 14px;
+    font-family: "Microsoft YaHei";
+    color: #333;
+    display: flex;
+    border-top: 1px solid #d3d3d3;
+    box-sizing: border-box;
+    cursor: default;
+}
+
+
+.list{
+    display: inline-block;
+    height: 100%;
+    width: 28%;
+    border-right: 1px solid #d3d3d3;
+    /*background: yellow;*/
+}
+.list > .tab{
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px solid #ddd;
+}
+.list > .tab > .tab-item{
+    text-align: center;
+    padding: 10px 0;
+    flex-grow: 1;
+}
+.list > .tab > .tab-item-active{
+    color: #199ED8;
+}
+.list > .tab > .tab-item:hover{
+    color: #199ED8;
+    cursor: pointer;
+}
+.list > .list-content{
+    height: 78%;
+    padding: 3px 14px;
+    border-bottom: 1px solid #ddd;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.list > .list-content > .get-path > .button{
+    width: 160px;
+    text-align: center;
+    background: #199ED8;
+    color: #fff;
+    margin: 25px auto;
+    padding: 8px 0;
+    cursor: pointer;
+}
+.list > .list-content > .get-path > .tip{
+    margin-top: 25px;
+    font-size: 15px;
+    text-align: center;
+}
+.list > .list-content > .get-path > .button:hover{
+    /*color: #199ED8;*/
+    background: #30ace2;
+}
+.list > .list-content > .get-path > .error-tip{
+    margin-top: 20px;
+    font-size: 13px;
+    color: red;
+    text-align: center;
+}
+.list > .list-content > .api-block{
+    margin: 2px 0;
+}
+.list > .list-content > .api-block > .block-name{
+    margin: 7px 0 5px;
+    font-weight: bold;
+    -moz-user-select:none;/*火狐*/
+    -webkit-user-select:none;/*webkit浏览器*/
+    -ms-user-select:none;/*IE10*/
+    -khtml-user-select:none;/*早期浏览器*/
+    user-select:none;
+    cursor: pointer;
+}
+.list > .list-content > .api-block > .block-name > .fa{
+    margin-right: 6px;
+}
+.list > .list-content > .api-block > .apis-content{
+    font-size: 13px;
+    margin-left: 15px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    -o-text-overflow:ellipsis;
+    -webkit-text-overflow:ellipsis;
+    -moz-text-overflow:ellipsis;
+    white-space : nowrap;
+    cursor: pointer;
+}
+.list > .list-content > .api-block > .apis-content > .api-item{
+    padding: 4px 0;
+}
+.list > .list-content > .api-block > .apis-content > .api-item:hover{
+    color: #777;
+}
+.list > .list-content > .api-block > .apis-content > .api-item > .method-POST{
+    font-weight: bold;
+    margin-right: 3px;
+    color: #199ED8;
+}
+.list > .list-content > .api-block > .apis-content > .api-item > .method-GET{
+    font-weight: bold;
+    margin-right: 3px;
+    color: #009966;
+}
+.list > .mode-toggle{
+    margin: 8px 14px;
+    font-size: 13px;
+}
+.list > .mode-toggle > .title{
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+.list > .mode-toggle > .mock, .list > .mode-toggle > .proxy{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.list > .mode-toggle .checkbox{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 12px;
+    border: 2px solid #bbb;
+    margin: 5px 6px 5px 0;
+}
+.list > .mode-toggle .checkbox > .checked{
+    width: 6px;
+    height: 6px;
+    margin: 3px auto;
+    border-radius: 6px;
+    background: #199ED8;
+}
+.list > .mode-toggle > .proxy > .server{
+    width: 144px;
+    outline: none;
+    padding: 4px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    margin-left: 8px;
+    border-radius: 5px;
+}
+.list > .mode-toggle > .proxy > .server:focus{
+    border-color: #199ED8;
+}
+
+
+
+.control-pad{
+    display: inline-block;
+    height: 100%;
+    flex-grow: 1;
+    /*background: red;*/
+}

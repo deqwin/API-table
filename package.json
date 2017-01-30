@@ -4,7 +4,7 @@
   "description": "a test tool for Restful API",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "open": "webpack-dev-server --inline --hot --open",
     "start": "webpack && electron main.js",
     "packager": "electron-packager ./ zhihu --win --out zhihu --arch=x64 --version 1.3.4 --overwrite --ignore=node_modules --version-string.CompanyName=zhihu --version-string.ProductName=zhihu",
     "package": "webpack && electron-packager ./ api-table --win --arch=x64 --out ./dist --version 0.4.0 --overwrite --icon=./app/image/zyin-icon.ico --ignore=node_modules"
@@ -13,6 +13,9 @@
   "license": "ISC",
   "devDependencies": {
     "angular": "^1.6.1",
+    "babel-cli": "^6.22.2",
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.22.0",
     "css-loader": "^0.26.1",
     "electron": "^1.4.15",

@@ -4,11 +4,52 @@
     <meta charset="UTF-8">
     <title>API table</title>
     <link rel="stylesheet" href="./font-awesome.css">
+    <link rel="stylesheet" href="./index.css">
 </head>
-<body ng-app="myapp">
-    <div ng-controller="HelloController">
-        <h2>Welcome {{helloTo.title}} to the world of Yiibai!</h2>
+<body ng-app="myApp">
+    <div class="list" ng-controller="listController">
+        <div class="tab">
+            <div class="tab-item tab-item-active">API 列表</div>
+            <div class="tab-item">调试中({{testNum}})</div>
+        </div>
+        <div class="list-content">
+            <div class="get-path" ng-show="!hasReadAPIFile">
+                <div class="tip">尚未导入API文档</div>
+                <div class="button" onclick="document.getElementById('getPath').click()">导入API文档</div>
+                <div class="error-tip" ng-show="error">导入非标准API文档，请重新导入</div>
+                <input id="getPath" type="file" style="display: none" onchange="angular.element(this).scope().doneGetPath(this.files[0].path)">
+            </div>
+            <div class="api-block" ng-repeat="(blockName, block) in APIList" ng-show="hasReadAPIFile">
+                <div class="block-name" ng-click="blockToggleDisplay(blockName)"><i class="fa fa-file-text-o"></i>{{blockName}}</div>
+                <div class="apis-content" ng-show="block.showDetail">
+                    <div class="api-item" ng-repeat="(apiName, api) in block.apis">
+                        <span ng-class="'method-'+api.method">{{api.method}}</span>
+                        {{apiName}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mode-toggle">
+            <div class="title">全局AJAX响应来源</div>
+            <div class="mock" ng-click="modeToggle('mock')">
+                <span class="checkbox">
+                    <div ng-class="mode=='mock'?'checked':null"></div>
+                </span>
+                mock数据
+            </div>
+            <div class="proxy" ng-click="modeToggle('proxy')">
+                <span class="checkbox">
+                    <div ng-class="mode=='proxy'?'checked':null"></div>
+                </span>
+                指定服务器
+                <input ng-disabled="mode=='proxy'?false:true" ng-model="server" type="text" class="server" placeholder="192.168.199.12:8080">
+            </div>
+        </div>
     </div>
+    <div class="control-pad">
+        
+    </div>
+    <script src="./service.js"></script>
     <script src="../build/bundle.js"></script>
 </body>
 </html>

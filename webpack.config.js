@@ -29,6 +29,9 @@ var options = {
       ],
       loaders: [
         {test: /\.scss$/, loader: "style!css!sass"}
+      ],
+      loaders: [
+        {test: /\.js$/, loader: "babel", query: { presets: ['es2015'] }}
       ]
     },
 };
