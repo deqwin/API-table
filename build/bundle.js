@@ -54,101 +54,166 @@
 
 	var _electron2 = _interopRequireDefault(_electron);
 
+	var _jsonFormat = __webpack_require__(4);
+
+	var _jsonFormat2 = _interopRequireDefault(_jsonFormat);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	/**
-	 * 渲染进程模块
-	 * created by deqwin
-	 * 2017/1/27
-	 */
-	var ipcRenderer = _electron2.default.ipcRenderer;
-	// import { userPCWeb } from '../../api/index.js';
-	// const a = require('./appServer.js');
+	var ipcRenderer = _electron2.default.ipcRenderer; /**
+	                                                   * 渲染进程模块
+	                                                   * created by deqwin
+	                                                   * 2017/1/27
+	                                                   */
 
-	_angular2.default.module("myApp", []).controller("listController", function ($scope) {
+	var app = _angular2.default.module("apiTable", []);
+
+	// 根控制器
+	app.controller("mainController", function ($scope) {
+
+	    $scope.$on('sendSelectedAPI', function (event, selectAPI) {
+	        $scope.$broadcast("receiveSelectedAPI", selectAPI);
+	    });
+
+	    $scope.$on('sendSelectedMode', function (event, selectAPI) {
+	        $scope.$broadcast('receiveSelectedMode', selectAPI);
+	    });
+	});
+
+	// 列表模块控制器
+	app.controller("listController", function ($scope) {
+
+	    // initialState
 	    $scope.testNum = 0;
-	    $scope.APIList = {
-	        wenku: {
-	            showDetail: false,
-	            apis: {
-	                '/wenku/getFileInfo': {
-	                    debugging: true, //是否在调试中
-	                    method: 'GET',
-	                    req: {
-	                        a1: 'arg1',
-	                        a2: 'arg2',
-	                        a3: 'arg3'
-	                    },
-	                    res: {
-	                        b1: 'bb1'
-	                    }
-	                },
-	                '/wenku/getFileDetailInfo': {
-	                    debugging: false, //是否在调试中
-	                    method: 'POST',
-	                    req: {
-	                        a1: 'arg1',
-	                        a2: 'arg2',
-	                        a3: 'arg3'
-	                    },
-	                    res: {
-	                        b1: 'bb1'
-	                    }
-	                }
-	            }
+	    $scope.APIList = {};
+	    $scope.selectedAPI = '';
+	    $scope.activeTab = 'all'; // 当前标签页
+	    $scope.hasReadAPIFile = false; // 是否读取到API文档
+	    $scope.error = false; // 是否发生导入错误
+	    $scope.mode = 'mock'; // 当前模式
+	    $scope.server = ''; // 目的服务器地址
 
-	        },
-	        library: {
-	            showDetail: true,
-	            apis: {
-	                '/library/getFileInfo': {
-	                    debugging: false, //是否在调试中
-	                    method: 'GET',
-	                    req: {
-	                        a1: 'arg1',
-	                        a2: 'arg2',
-	                        a3: 'arg3'
-	                    },
-	                    res: {
-	                        b1: 'bb1'
-	                    }
-	                },
-	                '/library/getFileDetailInfo': {
-	                    debugging: false, //是否在调试中
-	                    method: 'GET',
-	                    req: {
-	                        a1: 'arg1',
-	                        a2: 'arg2',
-	                        a3: 'arg3'
-	                    },
-	                    res: {
-	                        b1: 'bb1'
+
+	    // 获取到API文档路径
+	    $scope.doneGetPath = function (path) {
+
+	        var apiSource = window.dynamicRequire(path);
+
+	        // 尝试解析文档
+	        try {
+	            var APIList = {};
+	            for (var folderName in apiSource) {
+	                if (apiSource.hasOwnProperty(folderName)) {
+	                    var folderObj = apiSource[folderName];
+	                    APIList[folderName] = {
+	                        showDetail: true,
+	                        apis: {}
+	                    };
+	                    for (var apiName in folderObj) {
+	                        if (folderObj.hasOwnProperty(apiName)) {
+	                            var apiObject = folderObj[apiName];
+	                            var addObject = {
+	                                debugging: false
+	                            };
+	                            if (folderObj[apiName].method == undefined) {
+	                                throw '非标准API';
+	                                return;
+	                            }
+	                            if (folderObj[apiName].req == undefined) addObject.req = {};
+	                            APIList[folderName]['apis'][apiName] = Object.assign({}, apiObject, addObject);
+	                        }
 	                    }
 	                }
 	            }
-	        }
-	    };
-	    $scope.hasReadAPIFile = false;
-	    $scope.error = false;
-	    $scope.doneGetPath = function (path) {
-	        var apiBlock = window.dynamicRequire(path);
-	        if (apiBlock) {
+	            $scope.APIList = APIList;
+	        } catch (error) {
+	            console.error(error);
+	            apiSource = null;
+	        };
+
+	        // 将获取到的API集合发送给主进程
+	        // ipcRenderer.send()
+
+
+	        // 页面改变
+	        if (apiSource) {
 	            $scope.hasReadAPIFile = true;
+	            $scope.error = false;
+	            // 刺激页面改变
+	            $scope.$apply();
 	        } else {
+	            $scope.hasReadAPIFile = false;
 	            $scope.error = true;
+	            // 刺激页面改变
+	            return $scope.$apply();
 	        }
-	        $scope.$apply();
 	    };
+
+	    // 选择API
+	    $scope.selectAPI = function (block, api) {
+	        $scope.$emit('sendSelectedAPI', Object.assign({}, $scope.APIList[block]['apis'][api], { name: api }));
+	        $scope.selectedAPI = api;
+	    };
+
+	    // 标签页切换
+	    $scope.toggleTab = function (tab) {
+	        $scope.activeTab = tab;
+	    };
+
+	    // api块显隐切换
 	    $scope.blockToggleDisplay = function (key) {
 	        $scope.APIList[key]['showDetail'] = !$scope.APIList[key]['showDetail'];
 	    };
-	    $scope.mode = 'mock';
-	    $scope.server = '';
+
+	    // 切换响应模式
 	    $scope.modeToggle = function (mode) {
 	        $scope.mode = mode;
-	        $scope.hasReadAPIFile = !$scope.hasReadAPIFile;
 	    };
-	    // console.log(a);
+
+	    $scope.$on('receiveSelectedMode', function (event, selectAPI) {
+	        for (var blockName in $scope.APIList) {
+	            var apis = $scope.APIList[blockName]['apis'];
+	            if (apis.hasOwnProperty(selectAPI.name)) {
+	                $scope.APIList[blockName]['apis'][selectAPI.name]['debugging'] = !$scope.APIList[blockName]['apis'][selectAPI.name]['debugging'];
+	                if ($scope.APIList[blockName]['apis'][selectAPI.name]['debugging']) {
+	                    $scope.testNum++;
+	                } else {
+	                    $scope.testNum--;
+	                }
+	            }
+	        }
+	    });
+	});
+
+	// API细节模块控制器
+	app.controller("controlPadController", function ($scope) {
+
+	    // initialState
+	    $scope.selectAPI = null;
+	    $scope.server = ''; // 目的服务器地址
+	    $scope.testMode = 'frontEnd';
+	    $scope.sendFormat = 'query';
+	    $scope.receiveFormat = 'json';
+
+	    $scope.toggleTest = function () {
+	        $scope.$emit('sendSelectedMode', $scope.selectAPI);
+	        $scope.selectAPI.debugging = !$scope.selectAPI.debugging;
+	    };
+	    $scope.testModeToggle = function (testMode) {
+	        $scope.testMode = testMode;
+	    };
+	    $scope.selectRequestFormat = function (format) {
+	        $scope.sendFormat = format;
+	    };
+	    $scope.selectAnswerFormat = function (format) {
+	        $scope.receiveFormat = format;
+	    };
+
+	    $scope.$on('receiveSelectedAPI', function (event, selectAPI) {
+	        $scope.selectAPI = selectAPI;
+	        $scope.req = (0, _jsonFormat2.default)($scope.selectAPI.req, { type: 'space', spaces: 2 });
+	        $scope.res = (0, _jsonFormat2.default)($scope.selectAPI.res, { type: 'space', spaces: 2 });
+	    });
 	});
 
 /***/ },
@@ -17471,6 +17536,94 @@
 /***/ function(module, exports) {
 
 	module.exports = require("electron");
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/*
+	  change for npm modules.
+	  by Luiz Estácio.
+
+	  json-format v.1.1
+	  http://github.com/phoboslab/json-format
+
+	  Released under MIT license:
+	  http://www.opensource.org/licenses/mit-license.php
+	*/
+	var p = [],
+	    indentConfig = {
+	  tab: { char: '\t', size: 1 },
+	  space: { char: ' ', size: 4 }
+	},
+	    configDefault = {
+	  type: 'tab'
+	},
+	    push = function push(m) {
+	  return '\\' + p.push(m) + '\\';
+	},
+	    pop = function pop(m, i) {
+	  return p[i - 1];
+	},
+	    tabs = function tabs(count, indentType) {
+	  return new Array(count + 1).join(indentType);
+	};
+
+	function JSONFormat(json, indentType) {
+	  p = [];
+	  var out = "",
+	      indent = 0;
+
+	  // Extract backslashes and strings
+	  json = json.replace(/\\./g, push).replace(/(".*?"|'.*?')/g, push).replace(/\s+/, '');
+
+	  // Indent and insert newlines
+	  for (var i = 0; i < json.length; i++) {
+	    var c = json.charAt(i);
+
+	    switch (c) {
+	      case '{':
+	      case '[':
+	        out += c + "\n" + tabs(++indent, indentType);
+	        break;
+	      case '}':
+	      case ']':
+	        out += "\n" + tabs(--indent, indentType) + c;
+	        break;
+	      case ',':
+	        out += ",\n" + tabs(indent, indentType);
+	        break;
+	      case ':':
+	        out += ": ";
+	        break;
+	      default:
+	        out += c;
+	        break;
+	    }
+	  }
+
+	  // Strip whitespace from numeric arrays and put backslashes 
+	  // and strings back in
+	  out = out.replace(/\[[\d,\s]+?\]/g, function (m) {
+	    return m.replace(/\s/g, '');
+	  }).replace(/\\(\d+)\\/g, pop) // strings
+	  .replace(/\\(\d+)\\/g, pop); // backslashes in strings
+
+	  return out;
+	};
+
+	module.exports = function (json, config) {
+	  config = config || configDefault;
+	  var indent = indentConfig[config.type];
+
+	  if (indent == null) {
+	    throw new Error('Unrecognized indent type: "' + config.type + '"');
+	  }
+	  var indentType = new Array((config.size || indent.size) + 1).join(indent.char);
+	  return JSONFormat(JSON.stringify(json), indentType);
+	};
 
 /***/ }
 /******/ ]);

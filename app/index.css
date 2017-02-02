@@ -10,7 +10,7 @@ body{
     height: 100%;
     background: #fff;
     font-size: 14px;
-    font-family: "Microsoft YaHei";
+    font-family: "Microsoft YaHei" !important;
     color: #333;
     display: flex;
     border-top: 1px solid #d3d3d3;
@@ -44,9 +44,10 @@ body{
     cursor: pointer;
 }
 .list > .list-content{
-    height: 78%;
-    padding: 3px 14px;
+    height: 79.1%;
+    padding: 8px 0;
     border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -75,10 +76,10 @@ body{
     text-align: center;
 }
 .list > .list-content > .api-block{
-    margin: 2px 0;
+    padding: 2px 0;
 }
 .list > .list-content > .api-block > .block-name{
-    margin: 7px 0 5px;
+    margin: 5px 0 8px;
     font-weight: bold;
     -moz-user-select:none;/*火狐*/
     -webkit-user-select:none;/*webkit浏览器*/
@@ -88,11 +89,11 @@ body{
     cursor: pointer;
 }
 .list > .list-content > .api-block > .block-name > .fa{
-    margin-right: 6px;
+    margin: 0 6px 0 14px;
 }
 .list > .list-content > .api-block > .apis-content{
     font-size: 13px;
-    margin-left: 15px;
+    /*margin-left: 15px;*/
     overflow:hidden;
     text-overflow:ellipsis;
     -o-text-overflow:ellipsis;
@@ -102,10 +103,13 @@ body{
     cursor: pointer;
 }
 .list > .list-content > .api-block > .apis-content > .api-item{
-    padding: 4px 0;
+    padding: 4px 14px 4px 30px;
+}
+.list > .list-content .select{
+    background: #f1f1f1;
 }
 .list > .list-content > .api-block > .apis-content > .api-item:hover{
-    color: #777;
+    background: #f6f6f6;
 }
 .list > .list-content > .api-block > .apis-content > .api-item > .method-POST{
     font-weight: bold;
@@ -117,8 +121,38 @@ body{
     margin-right: 3px;
     color: #009966;
 }
+.list > .list-content > .testing-list{
+    cursor: pointer;
+}
+.list > .list-content > .testing-list > .apis-content{
+    font-size: 13px;
+    margin-left: 15px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    -o-text-overflow:ellipsis;
+    -webkit-text-overflow:ellipsis;
+    -moz-text-overflow:ellipsis;
+    white-space : nowrap;
+    cursor: pointer;
+}
+.list > .list-content > .testing-list .api-item{
+    padding: 4px 14px 4px 30px;
+}
+.list > .list-content > .testing-list .api-item:hover{
+    background: #f6f6f6;
+}
+.list > .list-content > .testing-list .api-item > .method-POST{
+    font-weight: bold;
+    margin-right: 3px;
+    color: #199ED8;
+}
+.list > .list-content > .testing-list .api-item > .method-GET{
+    font-weight: bold;
+    margin-right: 3px;
+    color: #009966;
+}
 .list > .mode-toggle{
-    margin: 8px 14px;
+    margin: 10px 14px;
     font-size: 13px;
 }
 .list > .mode-toggle > .title{
@@ -138,6 +172,9 @@ body{
     border: 2px solid #bbb;
     margin: 5px 6px 5px 0;
 }
+.list > .mode-toggle .checkbox-select{
+    border-color: #199ED8;
+}
 .list > .mode-toggle .checkbox > .checked{
     width: 6px;
     height: 6px;
@@ -145,7 +182,7 @@ body{
     border-radius: 6px;
     background: #199ED8;
 }
-.list > .mode-toggle > .proxy > .server{
+.list > .mode-toggle > .proxy > .server, .control-pad > .api-view > .test-mode > .back-end > .server{
     width: 144px;
     outline: none;
     padding: 4px;
@@ -154,7 +191,7 @@ body{
     margin-left: 8px;
     border-radius: 5px;
 }
-.list > .mode-toggle > .proxy > .server:focus{
+.list > .mode-toggle > .proxy > .server:focus, .control-pad > .api-view > .test-mode > .back-end > .server:focus{
     border-color: #199ED8;
 }
 
@@ -165,4 +202,198 @@ body{
     height: 100%;
     flex-grow: 1;
     /*background: red;*/
+}
+.control-pad > .empty{
+    margin: 180px 0;
+    text-align: center;
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: #999;
+}
+.control-pad > .api-view > .top{
+    display: flex;
+    padding: 16px 28px 14px;
+    justify-content: space-between;
+    align-items: center;
+}
+.control-pad > .api-view > .top > .title{
+    font-size: 17px;
+}
+.control-pad > .api-view > .top > .title-GET{
+    color: #009966;
+}
+.control-pad > .api-view > .top > .title-POST{
+    color: #199ED8;
+}
+.control-pad > .api-view > .top > .title > .method{
+    font-weight: bold;
+    margin-right: 6px;
+}
+.control-pad > .api-view > .top > .title > .api-name{
+    letter-spacing: 1px;
+}
+.control-pad > .api-view > .top > .toggle-test{
+    border: 1px solid #777;
+    color: #555;
+    outline: none;
+    border-radius: 4px;
+    padding: 5px 18px;
+    background: #fff;
+    cursor: pointer;
+    font-family: "Microsoft YaHei";
+}
+.control-pad > .api-view > .top > .testing{
+    border-color: #f60;
+    color: #f60;
+}
+.control-pad > .api-view > .top > .toggle-test:hover{
+    background: #199ED8;
+    border-color: #199ED8;
+    color: #fff;
+}
+.control-pad > .api-view > .test-mode{
+    display: flex;
+    padding: 0 28px;
+    align-items: center;
+}
+.control-pad > .api-view > .test-mode > .title{
+    font-weight: bold;
+}
+.control-pad > .api-view > .test-mode > .front-end{
+    margin: 0 13px 0 6px;
+    cursor: pointer;
+}
+.control-pad > .api-view > .test-mode > .back-end{
+    cursor: pointer;
+}
+.control-pad > .api-view .checkbox{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 12px;
+    border: 2px solid #bbb;
+    margin: 5px 6px 5px 0;
+    cursor: pointer;
+}
+.control-pad > .api-view .checkbox-select{
+    border-color: #199ED8;
+}
+.control-pad > .api-view > .test-mode > .back-end > .server{
+    margin-left: 14px;
+}
+.control-pad > .api-view > .test-mode > .front-end, .control-pad > .api-view > .test-mode > .back-end{
+    display: flex;
+    align-items: center;
+}
+.control-pad > .api-view .checkbox > .checked{
+    width: 6px;
+    height: 6px;
+    margin: 3px auto;
+    border-radius: 6px;
+    background: #199ED8;
+}
+.control-pad > .api-view > .request, .control-pad > .api-view > .answer{
+    padding: 8px 28px 1px;
+}
+.control-pad > .api-view > .request > .menu, .control-pad > .api-view > .answer > .menu{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 10px;
+}
+.control-pad > .api-view > .request > .menu > .left, .control-pad > .api-view > .answer > .menu > .left{
+    display: flex;
+    align-items: center;
+}
+.control-pad > .api-view > .request > .menu > .left > .title, .control-pad > .api-view > .answer > .menu > .left > .title{
+    font-weight: bold;
+    margin-right: 18px;
+    display: flex;
+    align-items: center;
+}
+.control-pad > .api-view > .request > .menu > .left > .title > .fa, .control-pad > .api-view > .answer > .menu > .left > .title > .fa{
+    margin-left: 8px;
+    font-size: 30px;
+    font-weight: bolder;
+}
+.control-pad > .api-view > .request > .menu > .left > .tip, .control-pad > .api-view > .answer > .menu > .left > .tip{
+    font-size: 13px;
+    color: #888;
+}
+.control-pad > .api-view .menu > .left > .format-select{
+    display: flex;
+    align-items: center;
+}
+.control-pad > .api-view .menu > .left > .format-select .text{
+    margin-right: 16px;
+    font-size: 13px;
+}
+.control-pad > .api-view .menu > .left > .format-select > div{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.control-pad > .api-view > .answer > .menu > .left > .tip{
+    color: #009966;
+}
+.control-pad > .api-view .menu > .right > .reset{
+    border: 1px solid #777;
+    color: #555;
+    outline: none;
+    border-radius: 4px;
+    padding: 5px 9px;
+    background: #fff;
+    cursor: pointer;
+    font-family: "Microsoft YaHei";
+}
+.control-pad > .api-view .menu > .right > .reset:hover{
+    border-color: #199ED8;
+    color: #199ED8;
+}
+.control-pad > .api-view > .request > .content, .control-pad > .api-view > .answer > .content{
+    margin-top: 8px;
+}
+.control-pad > .api-view > .request > .content > .note, .control-pad > .api-view > .answer > .content > .note{
+    font-size: 12px;
+    padding: 2px 6px;
+    color: #888;
+    border: 1px solid #ccc;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+.control-pad > .api-view > .request > .content textarea, .control-pad > .api-view > .answer > .content textarea{
+    display: block;
+    width: 100%;
+    border: 1px solid #ccc;
+    font-family: "Microsoft YaHei";
+    resize: none;
+    outline: none;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+::-webkit-scrollbar  
+{  
+    width: 8px;  
+    border-radius: 4px;
+    background-color: #ddd;  
+}  
+  
+/*定义滚动条轨道 内阴影+圆角*/  
+::-webkit-scrollbar-track  
+{  
+    border-radius: 4px;  
+    background-color: #ddd;  
+}  
+  
+/*定义滑块 内阴影+圆角*/  
+::-webkit-scrollbar-thumb  
+{  
+    border-radius: 4px;  
+    background-color: #aaa;  
+} 
+.control-pad > .api-view > .request > .content textarea{
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
