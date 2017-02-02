@@ -136,7 +136,7 @@ body{
     cursor: pointer;
 }
 .list > .list-content > .testing-list .api-item{
-    padding: 4px 14px 4px 30px;
+    padding: 4px 14px 4px 16px;
 }
 .list > .list-content > .testing-list .api-item:hover{
     background: #f6f6f6;

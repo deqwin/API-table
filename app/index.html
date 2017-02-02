@@ -126,20 +126,23 @@
                         </div>
                     </div>
                     <div class="right">
-                        <button class="reset" ng-show="testMode=='bakcEnd'">重置请求</button>
+                        <button class="reset" ng-show="testMode=='bakcEnd'" ng-click="resetReq()">重置请求</button>
                     </div>             
                 </div>
                 <div class="content">
                     <div class="note" ng-show="testMode=='frontEnd'">NOTE：属性键前带有“--error--”，为数据类型错误</div>
                     <div class="note" ng-show="testMode=='bakcEnd'">NOTE：下面统一使用JSON格式来书写请求，系统会自动转化为指定的数据格式进行发送</div>
-                    <textarea name="" id="" cols="30" rows="10" ng-readonly="testMode=='frontEnd'?true:false" ng-model="req"></textarea>
+                    <textarea cols="30" rows="10" 
+                        ng-readonly="testMode=='frontEnd'?true:false" 
+                        ng-model="req"
+                        ng-keyup="toSetNewRequest($event)"></textarea>
                 </div>
             </div>
             <div class="answer">
                 <div class="menu">
                     <div class="left">
                         <div class="title">响应体<i class="fa fa-angle-down"></i></div>
-                        <div class="tip" ng-show="testMode=='frontEnd'">可随时修改，修改后会响应新的mock数据。所做的修改不会写入API文档。</div>
+                        <div class="tip" ng-show="testMode=='frontEnd'">可随时修改，按“ctrl+S”键确认响应mock数据。所做的修改不会写入API文档。</div>
                         <div class="format-select" ng-show="testMode=='bakcEnd'">
                             <span class="text">发送格式</span>
                             <div ng-click="selectAnswerFormat('json')">
@@ -163,11 +166,14 @@
                         </div>
                     </div>
                     <div class="right">
-                        <button class="reset">重置响应体</button>    
+                        <button class="reset" ng-click="resetRes()">重置响应体</button>    
                     </div>             
                 </div>
                 <div class="content">
-                    <textarea name="" id="" cols="34" rows="14" ng-readonly="testMode=='bakcEnd'?true:false" ng-model="res"></textarea>
+                    <textarea cols="34" rows="14" 
+                        ng-readonly="testMode=='bakcEnd'?true:false" 
+                        ng-model="res"
+                        ng-keyup="toSetNewAnswer($event)"></textarea>
                 </div>
             </div>
         </div>
