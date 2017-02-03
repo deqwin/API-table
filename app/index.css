@@ -212,7 +212,7 @@ body{
 }
 .control-pad > .api-view > .top{
     display: flex;
-    padding: 16px 28px 14px;
+    padding: 14px 28px;
     justify-content: space-between;
     align-items: center;
 }

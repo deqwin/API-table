@@ -1,13 +1,15 @@
 /**
  * node程序
  */
-const path = require('path');
-const url = require('url');
-const fs = require('fs');
+const httpProxy = require('http-proxy');
 
 class appServer {
-    setNum(){}
-    setList(){}
+    init(){
+        return httpProxy.createProxyServer({})
+    }
+    web(req, res, obj){
+        this.web(req, res, obj)
+    }
 };
 
 module.exports = appServer;

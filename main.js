@@ -10,9 +10,10 @@ const http = require('http');
 const httpProxy = require('http-proxy');
 
 
+let APIList = {};
+
 app.on('ready', () => {
 
-    let APIList = {};
     let proxy = httpProxy.createProxyServer({});
 
     // 启动代理服务
@@ -25,7 +26,7 @@ app.on('ready', () => {
                 let apis = APIList[blockName]['apis'];
                 if (apis.hasOwnProperty(req.url)) {
 
-                    if(apis[req.url]['debugging'] = true){
+                    if(apis[req.url]['debugging'] == true){
                         res.writeHead(200,{
                             "Content-Type":"text/plain; charset=utf-8",
                             "Access-Control-Allow-Origin": "*"
@@ -51,12 +52,6 @@ app.on('ready', () => {
         }
     }).listen(1337);
 
-    // 列表信息更新
-    ipcMain.on('setNewAPIList', function(event, newAPIList) {
-        console.log('列表信息更新');
-        APIList = newAPIList;
-    });
-
     // 启动窗口
     win = new BrowserWindow({ 
         height: 700, 
@@ -65,5 +60,11 @@ app.on('ready', () => {
         title: 'API table' });
     win.loadURL('file://'+__dirname+'/app/index.html');
 
+});
 
+
+// 列表信息更新
+ipcMain.on('setNewAPIList', function(event, newAPIList) {
+    console.log('列表信息更新');
+    APIList = newAPIList;
 });

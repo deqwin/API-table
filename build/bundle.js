@@ -80,6 +80,7 @@
 	    });
 
 	    $scope.$on('sendSet', function (event, type, selectAPI, content) {
+	        console.log('here-2');
 	        $scope.$broadcast('receiveSet', type, selectAPI, content);
 	    });
 	});
@@ -132,7 +133,7 @@
 	                    }
 	                }
 	            }
-	            $scope.APISourceList = APIList;
+	            $scope.APISourceList = JSON.parse(JSON.stringify(APIList));
 	            $scope.APIList = APIList;
 	            $scope.testNum = testNum;
 	        } catch (error) {
@@ -214,6 +215,8 @@
 	    // 设置请求体/响应体
 	    $scope.$on('receiveSet', function (event, type, selectAPI, content) {
 
+	        console.log('here-3');
+
 	        for (var blockName in $scope.APIList) {
 	            var apis = $scope.APIList[blockName]['apis'];
 	            if (apis.hasOwnProperty(selectAPI.name)) {
@@ -268,7 +271,7 @@
 	    };
 	    // 重置响应体
 	    $scope.resetRes = function () {
-	        $scope.$emit('sendset', 'res', $scope.selectAPI);
+	        $scope.$emit('sendSet', 'res', $scope.selectAPI);
 	    };
 
 	    // 实现ctrl+S保存修改
@@ -279,7 +282,7 @@
 	    };
 	    $scope.toSetNewRequest = function (event) {
 	        if (event.keyCode == 83 && event.ctrlKey) {
-	            $scope.$emit('sendset', 'req', $scope.selectAPI, $scope.req);
+	            $scope.$emit('sendSet', 'req', $scope.selectAPI, $scope.req);
 	        }
 	    };
 	    // 监听选择API
