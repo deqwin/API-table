@@ -46,6 +46,13 @@
 
 	'use strict';
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /**
+	                                                                                                                                                                                                                                                                               * 渲染进程模块
+	                                                                                                                                                                                                                                                                               * created by deqwin
+	                                                                                                                                                                                                                                                                               * 2017/1/27
+	                                                                                                                                                                                                                                                                               */
+
+
 	var _angular = __webpack_require__(1);
 
 	var _angular2 = _interopRequireDefault(_angular);
@@ -60,16 +67,17 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var ipcRenderer = _electron2.default.ipcRenderer; /**
-	                                                   * 渲染进程模块
-	                                                   * created by deqwin
-	                                                   * 2017/1/27
-	                                                   */
+	var ipcRenderer = _electron2.default.ipcRenderer;
+
 
 	var app = _angular2.default.module("apiTable", []);
 
 	// 根控制器
 	app.controller("mainController", function ($scope) {
+
+	    $scope.mentionTitle = '';
+	    $scope.mentionContent = '';
+	    $scope.showMention = false;
 
 	    $scope.$on('sendSelectedAPI', function (event, selectAPI) {
 	        $scope.$broadcast("receiveSelectedAPI", selectAPI);
@@ -83,6 +91,32 @@
 	        console.log('here-2');
 	        $scope.$broadcast('receiveSet', type, selectAPI, content);
 	    });
+
+	    $scope.$on('sendSelectedServer', function (event, selectAPI) {
+	        $scope.$broadcast("receiveSelectedServer", selectAPI);
+	    });
+
+	    $scope.$on('sendSelectedGlobalMode', function (event, mode) {
+	        $scope.$broadcast("receiveSelectedGlobalMode", mode);
+	    });
+
+	    $scope.$on('sendSelectedTestMode', function (event, mode) {
+	        $scope.$broadcast("receiveSelectedTestMode", mode);
+	    });
+	});
+
+	app.service('Mention', function ($rootScope, $timeout) {
+	    return {
+	        popMention: function popMention(infoObj) {
+	            console.log(infoObj);
+	            $rootScope.mentionTitle = infoObj.title;
+	            $rootScope.mentionContent = infoObj.content;
+	            $rootScope.showMention = true;
+	            $timeout(function () {
+	                $rootScope.showMention = false;
+	            }, 2000);
+	        }
+	    };
 	});
 
 	// 列表模块控制器
@@ -120,7 +154,12 @@
 	                        if (folderObj.hasOwnProperty(apiName)) {
 	                            var apiObject = folderObj[apiName];
 	                            var addObject = {
-	                                debugging: true
+	                                debugging: true,
+	                                testMode: 'frontEnd',
+	                                sendFormat: 'query',
+	                                receiveFormat: 'json',
+	                                server: '',
+	                                name: apiName
 	                            };
 	                            if (folderObj[apiName].method == undefined) {
 	                                throw '非标准API';
@@ -160,7 +199,7 @@
 
 	    // 选择API
 	    $scope.selectAPI = function (block, api) {
-	        $scope.$emit('sendSelectedAPI', Object.assign({}, $scope.APIList[block]['apis'][api], { name: api }));
+	        $scope.$emit('sendSelectedAPI', $scope.APIList[block]['apis'][api]);
 	        $scope.selectedAPI = api;
 	    };
 
@@ -178,6 +217,8 @@
 	    $scope.modeToggle = function (mode) {
 	        var testNum = 0;
 	        $scope.mode = mode;
+	        $scope.$emit('sendSelectedGlobalMode', mode);
+
 	        for (var folderName in $scope.APIList) {
 	            if ($scope.APIList.hasOwnProperty(folderName)) {
 	                var apis = $scope.APIList[folderName]['apis'];
@@ -193,6 +234,12 @@
 
 	        // 与主进程同步API列表数据
 	        ipcRenderer.send('setNewAPIList', $scope.APIList);
+	    };
+
+	    // 设置全局目的服务器地址
+	    $scope.setGlobalServer = function () {
+	        // 与主进程同步API列表数据
+	        ipcRenderer.send('setNewGlobalServer', $scope.server);
 	    };
 
 	    $scope.$on('receiveSelectedMode', function (event, selectAPI) {
@@ -224,11 +271,45 @@
 	                    //设置
 	                    console.log(content);
 	                    $scope.APIList[blockName]['apis'][selectAPI.name][type] = JSON.parse(content);
-	                    $scope.$emit('sendSelectedAPI', Object.assign({}, $scope.APIList[blockName]['apis'][selectAPI.name], { name: selectAPI.name }));
 	                } else {
 	                    // 重置
 	                    $scope.APIList[blockName]['apis'][selectAPI.name][type] = $scope.APISourceList[blockName]['apis'][selectAPI.name][type];
-	                    $scope.$emit('sendSelectedAPI', Object.assign({}, $scope.APIList[blockName]['apis'][selectAPI.name], { name: selectAPI.name }));
+	                    $scope.$emit('sendSelectedAPI', $scope.APIList[blockName]['apis'][selectAPI.name]);
+	                }
+	            }
+	        };
+
+	        // 与主进程同步API列表数据
+	        ipcRenderer.send('setNewAPIList', $scope.APIList);
+	    });
+	    // 设置调试模式
+	    $scope.$on('receiveSelectedTestMode', function (event, mode) {
+	        for (var folderName in $scope.APIList) {
+	            if ($scope.APIList.hasOwnProperty(folderName)) {
+	                var apis = $scope.APIList[folderName]['apis'];
+	                for (var apiName in apis) {
+	                    if (apis.hasOwnProperty(apiName)) {
+	                        $scope.APIList[folderName]['apis'][apiName]['testMode'] = mode;
+	                    }
+	                }
+	            }
+	        };
+
+	        // 与主进程同步API列表数据
+	        ipcRenderer.send('setNewAPIList', $scope.APIList);
+	    });
+	    // 设置目的服务器地址
+	    $scope.$on('receiveSelectedServer', function (event, selectAPI) {
+
+	        console.log('here is');
+
+	        for (var folderName in $scope.APIList) {
+	            if ($scope.APIList.hasOwnProperty(folderName)) {
+	                var apis = $scope.APIList[folderName]['apis'];
+	                for (var apiName in apis) {
+	                    if (apis.hasOwnProperty(apiName) && (!apis[apiName]['server'] || apiName == selectAPI.name)) {
+	                        $scope.APIList[folderName]['apis'][apiName]['server'] = selectAPI.server;
+	                    }
 	                }
 	            }
 	        };
@@ -239,31 +320,32 @@
 	});
 
 	// API细节模块控制器
-	app.controller("controlPadController", function ($scope) {
+	app.controller("controlPadController", function ($scope, $http, Mention) {
 
 	    // initialState
 	    $scope.selectAPI = null;
-	    $scope.server = ''; // 目的服务器地址
-	    $scope.testMode = 'frontEnd';
-	    $scope.sendFormat = 'query';
-	    $scope.receiveFormat = 'json';
 
 	    // 切换API调试模式
 	    $scope.toggleTest = function () {
 	        $scope.$emit('sendSelectedMode', $scope.selectAPI);
-	        $scope.selectAPI.debugging = !$scope.selectAPI.debugging;
+	        console.log($scope.selectAPI, 'and', $scope.selectAPI.debugging);
+	    };
+	    // 设置API目的服务器地址
+	    $scope.setAPIServer = function () {
+	        console.log($scope.selectAPI);
+	        $scope.$emit('sendSelectedServer', $scope.selectAPI);
 	    };
 	    // 切换调试环境
 	    $scope.testModeToggle = function (testMode) {
-	        $scope.testMode = testMode;
+	        $scope.$emit('sendSelectedTestMode', testMode);
 	    };
 	    // 选择请求格式
 	    $scope.selectRequestFormat = function (format) {
-	        $scope.sendFormat = format;
+	        $scope.selectAPI.sendFormat = format;
 	    };
 	    // 选择响应格式
 	    $scope.selectAnswerFormat = function (format) {
-	        $scope.receiveFormat = format;
+	        $scope.selectAPI.receiveFormat = format;
 	    };
 	    // 重置请求体
 	    $scope.resetReq = function () {
@@ -273,23 +355,76 @@
 	    $scope.resetRes = function () {
 	        $scope.$emit('sendSet', 'res', $scope.selectAPI);
 	    };
+	    // 发送请求
+	    $scope.sendReq = function () {
 
+	        var ajaxData = {
+	            url: 'http://' + $scope.selectAPI.server + $scope.selectAPI.name,
+	            method: $scope.selectAPI.method
+	        };
+
+	        // 发送格式转化
+	        var dataContent = {};
+	        if ($scope.selectAPI.sendFormat == 'query') {
+	            // query
+	            dataContent = $scope.selectAPI.req;
+	        } else if ($scope.selectAPI.sendFormat == 'bodyJson') {
+	            // json
+	            dataContent = JSON.stringify($scope.selectAPI.req);
+	        } else {
+	            // formData
+	            dataContent = new FormData();
+	            var req = $scope.selectAPI.req;
+	            for (var key in req) {
+	                if (req.hasOwnProperty(key)) {
+	                    dataContent.append(key, req[key]);
+	                }
+	            }
+	        }
+	        // 添加请求实体
+	        ajaxData = Object.assign(ajaxData, $scope.selectAPI.method == 'GET' ? {
+	            params: dataContent
+	        } : {
+	            data: dataContent
+	        });
+
+	        $http(ajaxData).then(function (res) {
+	            if ((typeof res === 'undefined' ? 'undefined' : _typeof(res)) == 'object') {
+	                if ($scope.selectAPI.receiveFormat == 'webview') {
+	                    $scope.res = (0, _jsonFormat2.default)(res, { type: 'space', spaces: 2 });
+	                } else {
+	                    $scope.res = JSON.stringify(res);
+	                }
+	            } else {
+	                $scope.res = res.data;
+	            }
+	        });
+	    };
 	    // 实现ctrl+S保存修改
 	    $scope.toSetNewAnswer = function (event) {
 	        if (event.keyCode == 83 && event.ctrlKey) {
+	            Mention.popMention({ title: '响应体修改成功', content: '重新访问API将获取到新的mock数据' });
 	            $scope.$emit('sendSet', 'res', $scope.selectAPI, $scope.res);
 	        }
 	    };
 	    $scope.toSetNewRequest = function (event) {
 	        if (event.keyCode == 83 && event.ctrlKey) {
+	            Mention.popMention({ title: '请求体修改成功', content: '重新访问API将获取到新的mock数据' });
 	            $scope.$emit('sendSet', 'req', $scope.selectAPI, $scope.req);
 	        }
 	    };
 	    // 监听选择API
 	    $scope.$on('receiveSelectedAPI', function (event, selectAPI) {
+	        console.log('after', selectAPI);
 	        $scope.selectAPI = selectAPI;
 	        $scope.req = (0, _jsonFormat2.default)($scope.selectAPI.req, { type: 'space', spaces: 2 });
 	        $scope.res = (0, _jsonFormat2.default)($scope.selectAPI.res, { type: 'space', spaces: 2 });
+	    });
+	    // 监听选择调试模式
+	    $scope.$on('receiveSelectedGlobalMode', function (event, mode) {
+	        if ($scope.selectAPI) {
+	            $scope.selectAPI.debugging = mode == 'mock' ? true : false;
+	        }
 	    });
 	});
 

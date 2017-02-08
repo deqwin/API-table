@@ -11,6 +11,7 @@ const httpProxy = require('http-proxy');
 
 
 let APIList = {};
+let server = '';
 
 app.on('ready', () => {
 
@@ -22,10 +23,10 @@ app.on('ready', () => {
             console.log('API：', req.url, '有访问');
             // 查找API
             let hasThisAPI = false;
+            
             for(let blockName in APIList){
                 let apis = APIList[blockName]['apis'];
                 if (apis.hasOwnProperty(req.url)) {
-
                     if(apis[req.url]['debugging'] == true){
                         res.writeHead(200,{
                             "Content-Type":"text/plain; charset=utf-8",
@@ -34,7 +35,18 @@ app.on('ready', () => {
                         res.write(JSON.stringify(apis[req.url]['res']));
                         res.end();
                     }else{
-                        proxy.web(req, res, { target: 'http://localhost:1337' })
+
+                        proxy.on('error', function(e, req, res) {
+                            res.writeHead(200,{
+                                "Content-Type":"text/plain; charset=utf-8",
+                                "Access-Control-Allow-Origin": "*"
+                            });
+                            res.write( '访问目的服务器出错: ' + e );
+                            res.end();
+                        });
+
+                        proxy.web(req, res, { target: 'http://' + server + req.url });
+
                     }
 
                     hasThisAPI = true;
@@ -68,3 +80,8 @@ ipcMain.on('setNewAPIList', function(event, newAPIList) {
     console.log('列表信息更新');
     APIList = newAPIList;
 });
+
+// 全局目的服务器主机地址更新
+ipcMain.on('setNewGlobalServer', function(event, newServer){
+    server = newServer;
+})

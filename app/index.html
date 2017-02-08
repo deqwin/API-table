@@ -16,7 +16,7 @@
             <div class="tab-item" 
                 ng-class="activeTab=='testing'?'tab-item-active':null"
                 ng-click="toggleTab('testing')"
-            >调试中({{testNum}})</div>
+            >调试中(<span ng-bind="testNum"></span>)</div>
         </div>
         <div class="list-content">
             <!--待导入文档时-->
@@ -29,14 +29,14 @@
             <!--已存在API文档-->
             <!--完整列表-->
             <div class="api-block" ng-repeat="(blockName, block) in APIList" ng-show="hasReadAPIFile && activeTab=='all'">
-                <div class="block-name" ng-click="blockToggleDisplay(blockName)"><i class="fa fa-file-text-o"></i>{{blockName}}</div>
+                <div class="block-name" ng-click="blockToggleDisplay(blockName)"><i class="fa fa-file-text-o"></i><span ng-bind="blockName"></span></div>
                 <div class="apis-content" ng-show="block.showDetail">
                     <div class="api-item" 
                         ng-class="selectedAPI==apiName? 'select': null" 
                         ng-repeat="(apiName, api) in block.apis" 
                         ng-click="selectAPI(blockName, apiName)">
-                        <span ng-class="'method-'+api.method">{{api.method}}</span>
-                        {{apiName}}
+                        <span ng-class="'method-'+api.method" ng-bind="api.method"></span>
+                        <span ng-bind="apiName"></span>
                     </div>
                 </div>
             </div>
@@ -48,26 +48,29 @@
                         ng-repeat="(apiName, api) in block.apis" 
                         ng-click="selectAPI(blockName, apiName)" 
                         ng-show="api.debugging==true">
-                        <span ng-class="'method-'+api.method">{{api.method}}</span>
-                        {{apiName}}
+                        <span ng-class="'method-'+api.method" ng-bind="api.method"></span>
+                        <span ng-bind="apiName"></span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="mode-toggle">
-            <div class="title">全局AJAX响应来源</div>
+            <div class="title">系统工作模式</div>
             <div class="mock" ng-click="modeToggle('mock')">
                 <span class="checkbox" ng-class="mode=='mock'?'checkbox-select':null">
                     <div ng-class="mode=='mock'?'checked':null"></div>
                 </span>
-                mock数据
+                mock调试
             </div>
             <div class="proxy" ng-click="modeToggle('proxy')">
                 <span class="checkbox" ng-class="mode=='proxy'?'checkbox-select':null">
                     <div ng-class="mode=='proxy'?'checked':null"></div>
                 </span>
-                指定服务器
-                <input ng-disabled="mode=='proxy'?false:true" ng-change="$rootScope.a()" ng-model="server" type="text" class="server" placeholder="192.168.199.12:8080">
+                代理模式
+                <input type="text" class="server" 
+                    ng-disabled="mode=='proxy'?false:true" 
+                    ng-change="setGlobalServer()"
+                    ng-model="server" placeholder="192.168.199.12:8080">
             </div>
         </div>
     </div>
@@ -75,65 +78,68 @@
         <div class="api-view" ng-show="selectAPI">
             <div class="top">
                 <span class="title" ng-class="'title-'+selectAPI.method">
-                    <span class="method">{{selectAPI.method}}</span>
-                    <span class="api-name">{{selectAPI.name}}</span>
+                    <span class="method" ng-bind="selectAPI.method"></span>
+                    <span class="api-name" ng-bind="selectAPI.name"></span>
                 </span>
-                <button class="toggle-test" ng-class="selectAPI.debugging? 'testing': null" ng-click="toggleTest()">
-                    {{ selectAPI.debugging? '关闭调试':'标记为调试中' }}
+                <button class="toggle-test" ng-class="selectAPI.debugging? 'testing': null" 
+                    ng-click="toggleTest()" ng-bind="selectAPI.debugging? '关闭调试':'标记为调试中'">
                 </button>
             </div>
             <div class="test-mode">
                 <div class="title">调试模式：</div>
                 <div class="front-end" ng-click="testModeToggle('frontEnd')">
-                    <span class="checkbox" ng-class="testMode=='frontEnd'?'checkbox-select':null">
-                        <div ng-class="testMode=='frontEnd'?'checked':null"></div>
+                    <span class="checkbox" ng-class="selectAPI.testMode=='frontEnd'?'checkbox-select':null">
+                        <div ng-class="selectAPI.testMode=='frontEnd'?'checked':null"></div>
                     </span>
                     调试前端（返回mock数据）
                 </div>
                 <div class="back-end" ng-click="testModeToggle('bakcEnd')">
-                    <span class="checkbox" ng-class="testMode=='bakcEnd'?'checkbox-select':null">
-                        <div ng-class="testMode=='bakcEnd'?'checked':null"></div>
+                    <span class="checkbox" ng-class="selectAPI.testMode=='bakcEnd'?'checkbox-select':null">
+                        <div ng-class="selectAPI.testMode=='bakcEnd'?'checked':null"></div>
                     </span>
                     调试后端（发送请求到指定服务器）
-                    <input ng-disabled="testMode=='bakcEnd'?false:true" ng-change="$rootScope.a()" ng-model="server" type="text" class="server" placeholder="192.168.199.12:8080">
+                    <input ng-disabled="selectAPI.testMode=='bakcEnd'?false:true" ng-blur="setAPIServer()" ng-model="selectAPI.server" type="text" class="server" placeholder="192.168.199.12:8080">
                 </div>
             </div>
             <div class="request">
                 <div class="menu">
                     <div class="left">
                         <div class="title">请求体<i class="fa fa-angle-down"></i></div>
-                        <div class="tip" ng-show="testMode=='frontEnd'">以下统一用 JSON 表示请求体，在发送实际请求时会按需求自动转为相应的请求格式</div>
-                        <div class="format-select" ng-show="testMode=='bakcEnd'">
+                        <div class="tip" ng-show="selectAPI.testMode=='frontEnd'">以下统一用 JSON 表示请求体，在发送实际请求时会按需求自动转为相应的请求格式</div>
+                        <div class="format-select" ng-show="selectAPI.testMode=='bakcEnd'">
                             <span class="text">发送格式</span>
                             <div ng-click="selectRequestFormat('query')">
-                                <span class="checkbox" ng-class="sendFormat=='query'?'checkbox-select':null">
-                                    <div ng-class="sendFormat=='query'?'checked':null"></div>
+                                <span class="checkbox" ng-class="selectAPI.sendFormat=='query'?'checkbox-select':null">
+                                    <div ng-class="selectAPI.sendFormat=='query'?'checked':null"></div>
                                 </span>
                                 <span class="text">QUERY</span>
                             </div>
                             <div ng-click="selectRequestFormat('bodyJson')">
-                                <span class="checkbox" ng-class="sendFormat=='bodyJson'?'checkbox-select':null">
-                                    <div ng-class="sendFormat=='bodyJson'?'checked':null"></div>
+                                <span class="checkbox" ng-class="selectAPI.sendFormat=='bodyJson'?'checkbox-select':null">
+                                    <div ng-class="selectAPI.sendFormat=='bodyJson'?'checked':null"></div>
                                 </span>
                                 <span class="text">BODY-JSON</span>
                             </div>
                             <div ng-click="selectRequestFormat('bodyHtmlform')">
-                                <span class="checkbox" ng-class="sendFormat=='bodyHtmlform'?'checkbox-select':null">
-                                    <div ng-class="sendFormat=='bodyHtmlform'?'checked':null"></div>
+                                <span class="checkbox" ng-class="selectAPI.sendFormat=='bodyHtmlform'?'checkbox-select':null">
+                                    <div ng-class="selectAPI.sendFormat=='bodyHtmlform'?'checked':null"></div>
                                 </span>
                                 <span class="text">BODY-HTMLFORM</span>
                             </div>
                         </div>
                     </div>
                     <div class="right">
-                        <button class="reset" ng-show="testMode=='bakcEnd'" ng-click="resetReq()">重置请求</button>
+                        <button class="reset group-reset" ng-show="selectAPI.testMode=='bakcEnd'" ng-click="resetReq()">
+                            重置请求
+                        </button><button class="confirm" ng-show="selectAPI.testMode=='bakcEnd'" ng-click="sendReq()">
+                            发送请求</button>
                     </div>             
                 </div>
                 <div class="content">
-                    <div class="note" ng-show="testMode=='frontEnd'">NOTE：属性键前带有“--error--”，为数据类型错误</div>
-                    <div class="note" ng-show="testMode=='bakcEnd'">NOTE：下面统一使用JSON格式来书写请求，系统会自动转化为指定的数据格式进行发送</div>
+                    <div class="note" ng-show="selectAPI.testMode=='frontEnd'">NOTE：属性键前带有“--error--”，为数据类型错误</div>
+                    <div class="note" ng-show="selectAPI.testMode=='bakcEnd'">NOTE：下面统一使用JSON格式来书写请求，系统会自动转化为指定的数据格式进行发送</div>
                     <textarea cols="30" rows="10" 
-                        ng-readonly="testMode=='frontEnd'?true:false" 
+                        ng-readonly="selectAPI.testMode=='frontEnd'?true:false" 
                         ng-model="req"
                         ng-keyup="toSetNewRequest($event)"></textarea>
                 </div>
@@ -142,36 +148,36 @@
                 <div class="menu">
                     <div class="left">
                         <div class="title">响应体<i class="fa fa-angle-down"></i></div>
-                        <div class="tip" ng-show="testMode=='frontEnd'">可随时修改，按“ctrl+S”键确认响应mock数据。所做的修改不会写入API文档。</div>
-                        <div class="format-select" ng-show="testMode=='bakcEnd'">
-                            <span class="text">发送格式</span>
+                        <div class="tip" ng-show="selectAPI.testMode=='frontEnd'">可随时修改，按“ctrl+S”键确认响应mock数据。所做的修改不会写入API文档。</div>
+                        <div class="format-select" ng-show="selectAPI.testMode=='bakcEnd'">
+                            <span class="text">接收格式</span>
                             <div ng-click="selectAnswerFormat('json')">
-                                <span class="checkbox" ng-class="receiveFormat=='json'?'checkbox-select':null">
-                                    <div ng-class="receiveFormat=='json'?'checked':null"></div>
+                                <span class="checkbox" ng-class="selectAPI.receiveFormat=='json'?'checkbox-select':null">
+                                    <div ng-class="selectAPI.receiveFormat=='json'?'checked':null"></div>
                                 </span>
                                 <span class="text">JSON</span>
                             </div>
                             <div ng-click="selectAnswerFormat('raw')">
-                                <span class="checkbox" ng-class="receiveFormat=='raw'?'checkbox-select':null">
-                                    <div ng-class="receiveFormat=='raw'?'checked':null"></div>
+                                <span class="checkbox" ng-class="selectAPI.receiveFormat=='raw'?'checkbox-select':null">
+                                    <div ng-class="selectAPI.receiveFormat=='raw'?'checked':null"></div>
                                 </span>
                                 <span class="text">RAW</span>
                             </div>
                             <div ng-click="selectAnswerFormat('webview')">
-                                <span class="checkbox" ng-class="receiveFormat=='webview'?'checkbox-select':null">
-                                    <div ng-class="receiveFormat=='webview'?'checked':null"></div>
+                                <span class="checkbox" ng-class="selectAPI.receiveFormat=='webview'?'checkbox-select':null">
+                                    <div ng-class="selectAPI.receiveFormat=='webview'?'checked':null"></div>
                                 </span>
                                 <span class="text">WEBVIEW</span>
                             </div>
                         </div>
                     </div>
                     <div class="right">
-                        <button class="reset" ng-click="resetRes()">重置响应体</button>    
+                        <button class="reset" ng-click="resetRes()" ng-show="selectAPI.testMode=='frontEnd'">重置响应体</button>    
                     </div>             
                 </div>
                 <div class="content">
                     <textarea cols="34" rows="14" 
-                        ng-readonly="testMode=='bakcEnd'?true:false" 
+                        ng-readonly="selectAPI.testMode=='bakcEnd'?true:false" 
                         ng-model="res"
                         ng-keyup="toSetNewAnswer($event)"></textarea>
                 </div>
@@ -180,6 +186,10 @@
         <div class="empty" ng-show="!selectAPI">
             未选择需要调试的API
         </div>
+    </div>
+    <div class="mention" ng-show="$root.showMention">
+        <div class="title" ng-bind="$root.mentionTitle"></div>
+        <div class="content" ng-bind="$root.mentionContent"></div>
     </div>
     <script src="./service.js"></script>
     <script src="../build/bundle.js"></script>
