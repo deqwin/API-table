@@ -4,6 +4,7 @@ window.dynamicRequire = path => {
         console.log(require(path));
         return require(path);
     }catch(error){
+        console.log(error);
         return false;
     }
 };

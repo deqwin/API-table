@@ -157,7 +157,7 @@
 	                                debugging: true,
 	                                testMode: 'frontEnd',
 	                                sendFormat: 'query',
-	                                receiveFormat: 'json',
+	                                receiveFormat: 'webview',
 	                                server: '',
 	                                name: apiName
 	                            };
@@ -346,6 +346,11 @@
 	    // 选择响应格式
 	    $scope.selectAnswerFormat = function (format) {
 	        $scope.selectAPI.receiveFormat = format;
+	        if ($scope.selectAPI.receiveFormat == 'webview') {
+	            $scope.res = (0, _jsonFormat2.default)($scope.selectAPI.res, { type: 'space', spaces: 2 });
+	        } else {
+	            $scope.res = JSON.stringify($scope.selectAPI.res);
+	        }
 	    };
 	    // 重置请求体
 	    $scope.resetReq = function () {
@@ -398,6 +403,8 @@
 	            } else {
 	                $scope.res = res.data;
 	            }
+	        }, function (error) {
+	            Mention.popMention({ title: '访问服务器出错', content: '请检查服务器状态和主机地址是否正确' });
 	        });
 	    };
 	    // 实现ctrl+S保存修改

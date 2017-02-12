@@ -11,14 +11,15 @@ const httpProxy = require('http-proxy');
 
 
 let APIList = {};
-let server = '';
+let serverUrl = '';
+let server = null;
 
 app.on('ready', () => {
 
     let proxy = httpProxy.createProxyServer({});
 
     // 启动代理服务
-    http.createServer(function(req, res){
+    server = http.createServer(function(req, res){
         if(req.url!="/favicon.ico"){ // 阻拦二次访问
             console.log('API：', req.url, '有访问');
             // 查找API
@@ -45,7 +46,7 @@ app.on('ready', () => {
                             res.end();
                         });
 
-                        proxy.web(req, res, { target: 'http://' + server + req.url });
+                        proxy.web(req, res, { target: 'http://' + serverUrl + req.url });
 
                     }
 
@@ -73,6 +74,10 @@ app.on('ready', () => {
     win.loadURL('file://'+__dirname+'/app/index.html');
 
 });
+
+app.on('window-all-closed', () => {
+    server.close();
+})
 
 
 // 列表信息更新

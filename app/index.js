@@ -97,7 +97,7 @@ app.controller("listController", $scope => {
                                 debugging: true,
                                 testMode: 'frontEnd',
                                 sendFormat: 'query',
-                                receiveFormat: 'json',
+                                receiveFormat: 'webview',
                                 server: '',
                                 name: apiName
                             }; 
@@ -290,6 +290,11 @@ app.controller("controlPadController", ($scope, $http, Mention) => {
     // 选择响应格式
     $scope.selectAnswerFormat = format => {
         $scope.selectAPI.receiveFormat = format;
+        if($scope.selectAPI.receiveFormat == 'webview'){
+            $scope.res = jsonFormat($scope.selectAPI.res, {type: 'space', spaces: 2});
+        }else{
+            $scope.res = JSON.stringify($scope.selectAPI.res)
+        }
     };
     // 重置请求体
     $scope.resetReq = () => {
@@ -342,6 +347,8 @@ app.controller("controlPadController", ($scope, $http, Mention) => {
             }else{
                 $scope.res = res.data
             }
+        }, error => {
+            Mention.popMention({title: '访问服务器出错', content: '请检查服务器状态和主机地址是否正确'});
         });
     }
     // 实现ctrl+S保存修改
