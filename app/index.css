@@ -29,7 +29,6 @@ body{
 .list > .tab{
     display: flex;
     align-items: flex-start;
-    border-bottom: 1px solid #ddd;
 }
 .list > .tab > .tab-item{
     text-align: center;
@@ -44,30 +43,111 @@ body{
     cursor: pointer;
 }
 .list > .list-content{
+    /*position: relative;*/
     height: 79.1%;
-    padding: 8px 0;
-    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dfdfdf;
     box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
 }
-.list > .list-content > .get-path > .button{
-    width: 160px;
+.list > .list-content > .get-path > .button-group{
+    display: flex;
+    padding: 0 20px;
+}
+.list > .list-content > .get-path > .button-group > .button{
+    width: 120px;
     text-align: center;
     background: #199ED8;
     color: #fff;
-    margin: 25px auto;
+    margin: 25px 5px;
     padding: 8px 0;
     cursor: pointer;
 }
 .list > .list-content > .get-path > .tip{
-    margin-top: 25px;
-    font-size: 15px;
+    margin: 25px 0 13px;
+    font-size: 16px;
     text-align: center;
 }
-.list > .list-content > .get-path > .button:hover{
+.list > .list-content > .get-path > .additional-tip{
+    font-size: 12px;
+    text-align: center;
+    margin: 0 24px;
+    color: #009966;
+}
+.list > .list-content > .get-path > .button-group > .button:hover{
     /*color: #199ED8;*/
     background: #30ace2;
+}
+.list .create-pad{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .2);
+}
+.list .create-pad > .pad{
+    width: 380px;
+    height: 260px;
+    background: #fff;
+    padding: 14px 20px;
+    box-shadow: 1px 0px 10px #bbb;
+}
+.list .create-pad > .pad > .top{
+    display: flex;
+    justify-content: space-between;
+    font-size: 17px;
+}
+.list .create-pad > .pad > .top .title{
+    color: #1485b7;
+}
+.list .create-pad > .pad > .top .title > .fa{
+    margin-right: 8px;
+}
+.list .create-pad > .pad > .top .fa-close{
+    font-size: 19px;
+    color: #aaa;
+    cursor: pointer;
+}
+.list .create-pad > .pad > .name{
+    margin: 26px 14px 10px;
+}
+.list .create-pad > .pad > .name > input{
+    width: 260px;
+    padding: 5px 6px;
+    outline: none;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+}
+.list .create-pad > .pad .req-method, .list .create-pad > .pad .test-method{
+    display: flex;
+    align-items: center;
+    margin: 14px;
+}
+.list .create-pad > .pad .tip{
+    color: #009966;
+    font-size: 13px;
+    line-height: 22px;
+    padding: 8px 12px 0;
+}
+.list .create-pad > .pad .create-button{
+    display: block;
+    outline: none;
+    border: none;
+    padding: 9px 22px;
+    margin: 24px auto 0;
+    background: #199ED8;
+    box-shadow: 1px 0px 4px #ccc;
+    cursor: pointer;
+    font-size: 15px;
+    color: #fff;
+}
+.list .create-pad > .pad > .top .fa-close:hover{
+    color: #888;
 }
 .list > .list-content > .get-path > .error-tip{
     margin-top: 20px;
@@ -151,20 +231,38 @@ body{
     margin-right: 3px;
     color: #009966;
 }
+.list .set-list{
+    /*position: absolute;
+    bottom: 0;*/
+    background: #f3f3f3;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+.list .set-list > .button-item{
+    text-align: center;
+    padding: 4px 0;
+    width: 50%;
+}
+.list .set-list > .button-item:hover{
+    background: #ddd;
+    cursor: pointer;
+}
 .list > .mode-toggle{
-    margin: 10px 14px;
+    padding: 9px 0;
     font-size: 13px;
 }
 .list > .mode-toggle > .title{
     font-weight: bold;
-    margin-bottom: 6px;
+    margin: 0 0 6px 14px;
 }
 .list > .mode-toggle > .mock, .list > .mode-toggle > .proxy{
     display: flex;
     align-items: center;
     cursor: pointer;
+    margin-left: 14px;
 }
-.list > .mode-toggle .checkbox{
+.list .checkbox{
     display: inline-block;
     width: 12px;
     height: 12px;
@@ -172,10 +270,10 @@ body{
     border: 2px solid #bbb;
     margin: 5px 6px 5px 0;
 }
-.list > .mode-toggle .checkbox-select{
+.list .checkbox-select{
     border-color: #199ED8;
 }
-.list > .mode-toggle .checkbox > .checked{
+.list .checkbox > .checked{
     width: 6px;
     height: 6px;
     margin: 3px auto;

@@ -8,7 +8,7 @@
 </head>
 <body ng-app="apiTable" ng-controller="mainController">
     <div class="list" ng-controller="listController">
-        <div class="tab">
+        <div class="tab" ng-style="!hasReadAPIFile?{borderBottom: '1px solid #ddd'}:null">
             <div class="tab-item" 
                 ng-class="activeTab=='all'?'tab-item-active':null"
                 ng-click="toggleTab('all')"
@@ -21,12 +21,21 @@
         <div class="list-content">
             <!--待导入文档时-->
             <div class="get-path" ng-show="!hasReadAPIFile">
-                <div class="tip">尚未导入API文档</div>
-                <div class="button" onclick="document.getElementById('getPath').click()">导入API文档</div>
+                <div class="tip">暂无供调试的API</div>
+                <div class="additional-tip">若无API文档，请选择“新建API”创建需调试的API</div>
+                <div class="button-group">
+                    <div class="button" onclick="document.getElementById('getPath').click()">导入API文档</div>
+                    <div class="button" ng-click="showPad()">新建API</div>
+                </div>
                 <div class="error-tip" ng-show="error">导入非标准API文档，请重新导入</div>
                 <input id="getPath" type="file" style="display: none" onchange="angular.element(this).scope().doneGetPath(this.files[0].path)">
             </div>
             <!--已存在API文档-->
+            <div class="set-list"  ng-show="hasReadAPIFile">
+                <div class="button-item" onclick="document.getElementById('getPath').click()">切换文档</div>
+                <div class="button-item" ng-click="showPad()">新建API</div>
+                <div class="button-item">清除列表</div>
+            </div>
             <!--完整列表-->
             <div class="api-block" ng-repeat="(blockName, block) in APIList" ng-show="hasReadAPIFile && activeTab=='all'">
                 <div class="block-name" ng-click="blockToggleDisplay(blockName)"><i class="fa fa-file-text-o"></i><span ng-bind="blockName"></span></div>
@@ -71,6 +80,33 @@
                     ng-disabled="mode=='proxy'?false:true" 
                     ng-change="setGlobalServer()"
                     ng-model="server" placeholder="192.168.199.12:8080">
+            </div>
+        </div>
+        <div class="create-pad" ng-show="showCreatePad">
+            <div class="pad">
+                <div class="top">
+                    <span class="title"><i class="fa fa-list-ul"></i>新建API</span>
+                    <i class="fa fa-close" ng-click="hidePad()"></i>
+                </div>
+                <div class="name">URL地址： <input type="text" placeholder="/index/itemList" ng-model="createdAPI.name"></div>
+                <div class="req-method">请求方式： &nbsp;
+                    <span style="display: flex; align-items: center; cursor: pointer" ng-click="toggleMthod('GET')">
+                        <span class="checkbox" ng-class="createdAPI.method=='GET'?'checkbox-select':null">
+                            <div ng-class="createdAPI.method=='GET'?'checked':null"></div>
+                        </span>
+                        <span style="margin-right: 68px; font-weight: bold; color: #666">GET</span>
+                    </span>
+                    <span style="display: flex; align-items: center; cursor: pointer" ng-click="toggleMthod('POST')">
+                        <span class="checkbox" ng-class="createdAPI.method=='POST'?'checkbox-select':null">
+                            <div ng-class="createdAPI.method=='POST'?'checked':null"></div>
+                        </span>
+                        <span style="font-weight: bold; color: #666">POST</span>
+                    </span>
+                </div>
+                <div class="tip">
+                    * 新建的API将被添加到调试列表，对于来访的其他未在调试列表中的API，将根据全局模式指定的服务器进行代理转发
+                </div>
+                <button class="create-button" ng-click="createAPI()">确认创建</button>
             </div>
         </div>
     </div>

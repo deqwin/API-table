@@ -132,7 +132,18 @@
 	    $scope.error = false; // 是否发生导入错误
 	    $scope.mode = 'mock'; // 当前模式
 	    $scope.server = ''; // 目的服务器地址
-
+	    $scope.showCreatePad = false;
+	    $scope.createdAPI = {
+	        debugging: true,
+	        testMode: 'frontEnd',
+	        sendFormat: 'query',
+	        receiveFormat: 'webview',
+	        server: '',
+	        name: '',
+	        method: 'GET',
+	        req: {},
+	        res: {}
+	    };
 
 	    // 获取到API文档路径
 	    $scope.doneGetPath = function (path) {
@@ -208,6 +219,54 @@
 	        $scope.activeTab = tab;
 	    };
 
+	    // 创建面板
+	    // 切换请求方式
+	    $scope.showPad = function () {
+	        $scope.showCreatePad = true;
+	    };
+	    $scope.hidePad = function () {
+	        $scope.showCreatePad = false;
+	    };
+	    $scope.toggleMthod = function (method) {
+	        $scope.createdAPI.method = method;
+	    };
+	    $scope.createAPI = function () {
+
+	        if (!$scope.createdAPI.name) return;
+
+	        if ($scope.APIList.hasOwnProperty('新建API')) {
+	            $scope.APIList['新建API']['apis'][$scope.createdAPI.name] = Object.assign({}, $scope.createdAPI);
+	        } else {
+	            $scope.APIList = Object.assign($scope.APIList, {
+	                '新建API': {
+	                    showDetail: true,
+	                    apis: {}
+	                }
+	            });
+	            $scope.APIList['新建API']['apis'][$scope.createdAPI.name] = Object.assign({}, $scope.createdAPI);
+	            $scope.hasReadAPIFile = true;
+	        }
+
+	        $scope.showCreatePad = false;
+	        console.log('创建后的API列表', $scope.APIList);
+
+	        // 将获取到的API集合发送给主进程
+	        ipcRenderer.send('setNewAPIList', $scope.APIList);
+
+	        // 重置数据
+	        $scope.createdAPI = {
+	            debugging: true,
+	            testMode: 'frontEnd',
+	            sendFormat: 'query',
+	            receiveFormat: 'webview',
+	            server: '',
+	            name: '',
+	            method: 'GET',
+	            req: {},
+	            res: {}
+	        };
+	    };
+
 	    // api块显隐切换
 	    $scope.blockToggleDisplay = function (key) {
 	        $scope.APIList[key]['showDetail'] = !$scope.APIList[key]['showDetail'];
@@ -239,6 +298,7 @@
 	    // 设置全局目的服务器地址
 	    $scope.setGlobalServer = function () {
 	        // 与主进程同步API列表数据
+	        console.log($scope.server);
 	        ipcRenderer.send('setNewGlobalServer', $scope.server);
 	    };
 
@@ -411,6 +471,7 @@
 	    $scope.toSetNewAnswer = function (event) {
 	        if (event.keyCode == 83 && event.ctrlKey) {
 	            Mention.popMention({ title: '响应体修改成功', content: '重新访问API将获取到新的mock数据' });
+	            console.log($scope.res);
 	            $scope.$emit('sendSet', 'res', $scope.selectAPI, $scope.res);
 	        }
 	    };

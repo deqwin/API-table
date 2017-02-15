@@ -26,27 +26,51 @@ app.on('ready', () => {
             let hasThisAPI = false;
             
             for(let blockName in APIList){
-                let apis = APIList[blockName]['apis'];
-                if (apis.hasOwnProperty(req.url)) {
-                    if(apis[req.url]['debugging'] == true){
+                let apis = APIList[blockName]['apis'],
+                    reqUrl = req.url.split('?').shift();
+                    console.log('来呀快活啊：', reqUrl);
+                if (apis.hasOwnProperty(reqUrl)) {
+                    console.log(apis[reqUrl]);
+                    if(apis[reqUrl]['debugging'] == true){
+
+                        // 设置Access-Control-Allow-Headers
+                        let headersAllow = [];
+                        for(let header in req.headers){
+                            headersAllow.push(header);
+                        }
+                        console.log(req.raw); 
+                        
                         res.writeHead(200,{
-                            "Content-Type":"text/plain; charset=utf-8",
-                            "Access-Control-Allow-Origin": "*"
+                            "Access-Control-Allow-Credentials": "true",
+                            "Content-Type": "application/json; charset=UTF-8",
+                            "Access-Control-Allow-Origin": "*",
+                            "access-control-allow-methods": "GET, POST, OPTIONS",
+                            "Access-Control-Allow-Headers": req.rawHeaders
                         });
-                        res.write(JSON.stringify(apis[req.url]['res']));
+                        res.write(JSON.stringify(apis[reqUrl]['res']));
                         res.end();
                     }else{
 
                         proxy.on('error', function(e, req, res) {
+
+                            // 设置Access-Control-Allow-Headers
+                            let headersAllow = [];
+                            for(let header in req.headers){
+                                headersAllow.push(header);
+                            }
+
                             res.writeHead(200,{
-                                "Content-Type":"text/plain; charset=utf-8",
-                                "Access-Control-Allow-Origin": "*"
+                                "Access-Control-Allow-Credentials": "true",
+                                "Content-Type": "application/json; charset=UTF-8",
+                                "Access-Control-Allow-Origin": "*",
+                                "access-control-allow-methods": "GET, POST, OPTIONS",
+                                "Access-Control-Allow-Headers": headersAllow.join(' ')
                             });
                             res.write( '访问目的服务器出错: ' + e );
                             res.end();
                         });
 
-                        proxy.web(req, res, { target: 'http://' + serverUrl + req.url });
+                        proxy.web(req, res, { target: 'http://' + serverUrl });
 
                     }
 
@@ -55,12 +79,23 @@ app.on('ready', () => {
             };
 
             if(!hasThisAPI){
-                res.writeHead(200,{
-                    "Content-Type":"text/plain; charset=utf-8",
-                    "Access-Control-Allow-Origin": "*"
+                proxy.on('error', function(e, req, res) {
+                    res.writeHead(200,{
+                        "Access-Control-Allow-Credentials": "true",
+                        "Content-Type": "application/json; charset=UTF-8",
+                        "Access-Control-Allow-Origin": "*",
+                        "access-control-allow-methods": "GET, POST, OPTIONS",
+                        "Access-Control-Allow-Headers": "Origin, Content-Type, Cookie, Accept, CLIENTID, MERCHANTID, ATMID, MOBILEID, WENKUADMINID"
+                    });
+                    res.write( '该API未在调试列表中，尝试转发访问出错: ' + e );
+                    res.end();
                 });
-                res.write('查找不到相关的API');
-                res.end();
+
+                // console.log('http://' + serverUrl + req.url);
+
+                // 修改请求体host
+                req.headers.host = serverUrl;
+                proxy.web(req, res, { target: 'http://' + serverUrl });
             }
         }
     }).listen(1337);
@@ -88,5 +123,5 @@ ipcMain.on('setNewAPIList', function(event, newAPIList) {
 
 // 全局目的服务器主机地址更新
 ipcMain.on('setNewGlobalServer', function(event, newServer){
-    server = newServer;
+    serverUrl = newServer;
 })
